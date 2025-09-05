@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Conexão Viva: Campo e Cidade Juntos</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #f4f9f4, #e8f5e9);
+      min-height: 100vh;
+      color: #333;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    /* --- Tela de início --- */
+    #intro-screen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      z-index: 9999;
+      transition: opacity 1s ease;
+    }
+
+    #intro-screen h1 {
+      color: white;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+    }
+
+    #explorar-btn {
+      background: #4CAF50;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: white;
+      cursor: pointer;
+      transition: transform 0.3s, background 0.3s;
+    }
+
+    #explorar-btn:hover {
+      background: #66bb6a;
+      transform: scale(1.05);
+    }
+
+    /* Conteúdo do site (começa escondido) */
+    #site-content {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: opacity 1s ease, transform 1s ease;
+    }
+
+    #site-content.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    header {
+      background: linear-gradient(90deg, #2e7d32, #4CAF50);
+      color: white;
+      padding: 50px 20px;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 3rem;
+      font-weight: 800;
+    }
+
+    header p {
+      font-size: 1.2rem;
+      margin: 10px 0;
+    }
+
+    header .btn {
+      background: white;
+      color: #2e7d32;
+      padding: 10px 20px;
+      border-radius: 30px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: 0.3s;
+    }
+    header .btn:hover {
+      background: #c8e6c9;
+      transform: scale(1.05);
+    }
+
+    main {
+      padding: 30px;
+      display: grid;
+      gap: 30px;
+    }
+
+    .bloco {
+      background: white;
+      padding: 20px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+      transition: transform 0.2s;
+    }
+    .bloco:hover {
+      transform: translateY(-5px);
+    }
+
+    .bloco h2 {
+      color: #2e7d32;
+      margin-bottom: 15px;
+    }
+
+    .bloco ul {
+      padding-left: 20px;
+    }
+
+    /* Quiz */
+    .quiz-topo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    .quiz-topo img {
+      width: 80px;
+    }
+    .pergunta-quiz {
+      margin-top: 20px;
+      padding: 15px;
+      border: 2px solid #ddd;
+      border-radius: 15px;
+      background: #f9fef9;
+    }
+    .opcao {
+      display: block;
+      background: #f1f8f1;
+      border: 2px solid #ddd;
+      border-radius: 10px;
+      padding: 8px;
+      margin: 5px 0;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+    .opcao:hover {
+      background: #e8f5e9;
+    }
+    .opcao.correta {
+      background: #c8e6c9 !important;
+      border-color: #2e7d32;
+      color: #2e7d32;
+    }
+    .opcao.errada {
+      background: #ffcdd2 !important;
+      border-color: #c62828;
+      color: #b71c1c;
+    }
+    .feedback {
+      margin-top: 5px;
+      font-weight: bold;
+      display: none;
+    }
+    .feedback.correta { color: #2e7d32; }
+    .feedback.errada { color: #b71c1c; }
+
+    #placar {
+      margin-top: 20px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      color: #2e7d32;
+    }
+
+    .barra-progresso {
+      width: 100%;
+      height: 10px;
+      background: #eee;
+      border-radius: 5px;
+      margin-top: 15px;
+      overflow: hidden;
+    }
+    .barra-preenchida {
+      height: 100%;
+      width: 0;
+      background: linear-gradient(90deg, #2e7d32, #4CAF50);
+      transition: width 0.3s;
+    }
+
+    footer {
+      background: #2e7d32;
+      color: white;
+      text-align: center;
+      padding: 20px;
+      margin-top: 30px;
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- Tela inicial -->
+<div id="intro-screen">
+  <h1>Conexão Viva</h1>
+  <button id="explorar-btn">Explorar Conexão</button>
+</div>
+
+<!-- Conteúdo do site -->
+<div id="site-content">
+  <header>
+    <div class="intro">
+      <h1>Conexão Viva</h1>
+      <p>Festejando a conexão entre o campo e a cidade</p>
+      <a href="#cidade" class="btn">Explorar a Conexão</a>
+    </div>
+  </header>
+
+  <main>
+    <section id="cidade" class="bloco cidade">
+      <h2>Vida na Cidade</h2>
+      <p>A cidade pulsa com movimento, tecnologia e serviços...</p>
+      <ul>
+        <li>Alimentos frescos das fazendas</li>
+        <li>Transporte e logística rural</li>
+        <li>Feiras e produtos artesanais</li>
+      </ul>
+    </section>
+
+    <section class="bloco campo">
+      <h2>Vida no Campo</h2>
+      <p>O campo é o berço da produção, da natureza e da tranquilidade...</p>
+      <ul>
+        <li>Educação a distância</li>
+        <li>Tratores inteligentes e conectividade</li>
+        <li>Inovações para a agricultura</li>
+      </ul>
+    </section>
+
+    <section class="bloco quiz">
+      <div class="quiz-topo">
+        <img src="ca2c963d-7862-4877-960c-0203c1e37db9-removebg-preview.png" alt="Personagem COOlworld">
+        <div>
+          <h2>Quiz: Campo e Cidade</h2>
+          <p>Teste seus conhecimentos sobre essa importante conexão!</p>
+        </div>
+      </div>
+
+      <form class="quiz-form">
+        <div class="pergunta-quiz" data-valor="2.5">
+          <h3>1. Qual é o principal benefício que o campo fornece para as cidades?</h3>
+          <label class="opcao"><input type="radio" name="p1" value="correta"> Alimentos frescos e matéria-prima</label>
+          <label class="opcao"><input type="radio" name="p1" value="incorreta"> Tecnologia de ponta</label>
+          <label class="opcao"><input type="radio" name="p1" value="incorreta"> Serviços financeiros</label>
+          <div class="feedback"></div>
+        </div>
+        <div class="pergunta-quiz" data-valor="2.5">
+          <h3>2. Como as cidades podem ajudar o campo?</h3>
+          <label class="opcao"><input type="radio" name="p2" value="incorreta"> Fornecendo mais terras</label>
+          <label class="opcao"><input type="radio" name="p2" value="correta"> Oferecendo tecnologia e educação</label>
+          <label class="opcao"><input type="radio" name="p2" value="incorreta"> Enviando mais pessoas</label>
+          <div class="feedback"></div>
+        </div>
+        <div class="pergunta-quiz" data-valor="2.5">
+          <h3>3. Qual desses projetos fortalece a conexão campo-cidade?</h3>
+          <label class="opcao"><input type="radio" name="p3" value="incorreta"> Shopping centers</label>
+          <label class="opcao"><input type="radio" name="p3" value="correta"> Feiras agrícolas</label>
+          <label class="opcao"><input type="radio" name="p3" value="incorreta"> Fast-food</label>
+          <div class="feedback"></div>
+        </div>
+        <div class="pergunta-quiz" data-valor="2.5">
+          <h3>4. Qual é um desafio comum?</h3>
+          <label class="opcao"><input type="radio" name="p4" value="correta"> Logística de transporte</label>
+          <label class="opcao"><input type="radio" name="p4" value="incorreta"> Excesso de comunicação</label>
+          <div class="feedback"></div>
+        </div>
+      </form>
+
+      <div class="barra-progresso"><div class="barra-preenchida"></div></div>
+      <div id="placar">Pontuação: 0.00 / 10.00</div>
+      <div id="mensagem-final"></div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 - Conexão Viva</p>
+  </footer>
+</div>
+
+<script>
+  // Transição da tela preta
+  const introScreen = document.getElementById("intro-screen");
+  const siteContent = document.getElementById("site-content");
+  const explorarBtn = document.getElementById("explorar-btn");
+
+  explorarBtn.addEventListener("click", () => {
+    introScreen.style.opacity = "0";
+    setTimeout(() => {
+      introScreen.style.display = "none";
+      siteContent.classList.add("show");
+    }, 1000);
+  });
+
+  // Quiz
+  const perguntas = document.querySelectorAll('.pergunta-quiz');
+  const placar = document.getElementById('placar');
+  const progresso = document.querySelector('.barra-preenchida');
+  const msgFinal = document.getElementById('mensagem-final');
+  let pontos = 0, respondidas = 0;
+
+  perguntas.forEach((pergunta, i) => {
+    const opcoes = pergunta.querySelectorAll('input');
+    const feedback = pergunta.querySelector('.feedback');
+    let respondida = false;
+
+    opcoes.forEach(opcao => {
+      opcao.addEventListener('change', () => {
+        if (respondida) return;
+        respondida = true;
+        respondidas++;
+
+        if (opcao.value === "correta") {
+          pontos += parseFloat(pergunta.dataset.valor);
+          opcao.parentElement.classList.add('correta');
+          feedback.textContent = "✔ Resposta correta!";
+          feedback.className = "feedback correta";
+        } else {
+          opcao.parentElement.classList.add('errada');
+          feedback.textContent = "✖ Resposta incorreta!";
+          feedback.className = "feedback errada";
+        }
+        feedback.style.display = "block";
+
+        const nota = ((pontos / (perguntas.length * 2.5)) * 10).toFixed(2);
+        placar.textContent = `Pontuação: ${nota} / 10.00`;
+
+        progresso.style.width = `${(respondidas / perguntas.length) * 100}%`;
+
+        if (respondidas === perguntas.length) {
+          if (nota >= 8) msgFinal.textContent = "🌿 Excelente! Você mandou muito bem!";
+          else if (nota >= 5) msgFinal.textContent = "👍 Bom! Mas dá pra melhorar.";
+          else msgFinal.textContent = "😢 Precisa estudar mais sobre a conexão campo-cidade.";
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>
